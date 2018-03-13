@@ -1,7 +1,6 @@
 clear all;
 clc;
 
-% syms r phi
 c = 3; % in "m"
 h = 4; % in "m"
 r0= 4; % in "m"
