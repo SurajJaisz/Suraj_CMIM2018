@@ -5,7 +5,7 @@ function result = Newton_Raphson(f,dfdx,starting_value,eps)
 
     x = starting_value;
     while abs(f(x)) > eps
-        x = x - f(x)/dfdx(x);
+        x = x - dfdx(x)\f(x);
     end
     result = x;
 end
