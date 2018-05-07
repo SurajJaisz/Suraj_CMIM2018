@@ -1,37 +1,86 @@
 %% Forced Vibration Steady-State Response Script
 % Author:   Suraj Jaiswal,
 % Date:     06.02.2018
+% Updated:  07.05.2018
+
 %% Clearing the matlab workspace
 %%
-clear all;
 clear;
 close all;
 clc;
 
 %% Defining symbolic variables
 %%
-syms m k c F0 omega real
+syms m k c A F0 omega real
 syms x(t)
 assumeAlso(m > 0);
 assumeAlso(k > 0);
 assumeAlso(c > 0);
-assumeAlso(F0 > 0);
+assumeAlso(omega > 0)
+assume(t, 'real');
+assumeAlso(t >= 0);
+% assumeAlso(F0 > 0);
 
 %% Analyze forced vibration system with initial conditions
 % $$m\ddot{x}+c\dot{x}+kx={F_0}sin(\omega t)$$
-% $$x(0)=0, \dot{x}(0)=0$$
+% $$x(0)=A, \dot{x}(0)=0$$
 %%
 xp = diff(x, t);
 xpp = diff(xp, t);
 
 Eq1 = m*xpp + c*xp + k*x == F0*sin(omega*t);
 
-solution_forcedVibration = dsolve(Eq1, [xp(0) == 0, x(0) == 0] );
+solution_forcedVibration = dsolve(Eq1, [xp(0) == 0, x(0) == A] );
 disp(solution_forcedVibration)
 symvar(solution_forcedVibration)
 
+%% Subtitution to simply the expression
 %%
-% The initial condition considered here will result in the steady state solution
+syms cc zeta omega_n real
+assumeAlso(cc > 0)
+assumeAlso(zeta > 0)
+assumeAlso(omega_n > 0)
+
+solution_forcedVibration_rewrite1 = simplify(subs(expand(solution_forcedVibration), c, cc*zeta));
+solution_forcedVibration_rewrite2 = simplify(subs(expand(solution_forcedVibration_rewrite1), 4*k*m, cc*cc));
+solution_forcedVibration_rewrite3 = simplify(subs(expand(solution_forcedVibration_rewrite2), cc, 2*sqrt(k*m)));
+solution_forcedVibration_rewrite4 = simplify(subs(expand(solution_forcedVibration_rewrite3), sqrt(k/m), omega_n));
+solution_forcedVibration_rewrite5 = simplify(subs(expand(solution_forcedVibration_rewrite4), m, k/omega_n^2));
+
+disp(solution_forcedVibration_rewrite5)
+symvar(solution_forcedVibration_rewrite5)
+pretty(solution_forcedVibration_rewrite5)
+
+%% Response from Symbolical Solution of Forced Damped Vibration 
+%%
+symbolicResponse_forcedVibration = simplify(expand(subs(solution_forcedVibration_rewrite5,[A,F0,k,omega,omega_n,zeta],[0,20,10,2,2,0.5])))
+
+%% Response from Steady State Solution of Forced Damped Vibration 
+%%
+X = @(omega,zeta) 20/(10*sqrt((1-omega^2/2^2)^2+(2*zeta*omega/2)^2));
+phi = @(omega,zeta) atan((-2*zeta*omega/2)/(1-omega^2/2^2));
+analyticalResponse_forcedVibration1 = @(omega,zeta,t) X(omega,zeta)*sin(omega*t+phi(omega,zeta));
+analyticalResponse_forcedVibration = @(t) analyticalResponse_forcedVibration1(2,0.5,t)
+
+%% Function for Creating High Quality Publications Plots
+%%
+% function_HighQualityPlot;
+
+%% Comparing the Symbolic Response with the Steady State Response
+%%
+figure
+fplot(symbolicResponse_forcedVibration,[0,10],'k-','LineWidth',1.5);
+hold on;
+fplot(analyticalResponse_forcedVibration,[0,10],'k:','LineWidth',1.5);
+hold off;
+xlabel('Time');
+ylabel('Position');
+legend('Response from Symbolical Solution','Response from Steady State Solution');
+function_HighQualityPlot(gcf,'Times New Roman',12);
+
+%% Printing Plot as a Vector Graphics to be used in Microsoft Word
+%%
+print('ForcedVibrationResponse','-dmeta')
 
 %% Analytical Solution for the Amplitude of the Steady State Reponse
 % $$X={F_0}/m\sqrt(((\omega_n)^2-(\omega)^2)^2+(2 \zeta \omega_n \omega)^2)$$
