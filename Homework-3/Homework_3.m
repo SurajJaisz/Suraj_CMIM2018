@@ -82,6 +82,34 @@ function_HighQualityPlot(gcf,'Times New Roman',12);
 %%
 print('ForcedVibrationResponse','-dmeta')
 
+%% Amplitude Response for Forced Vibration
+%%
+omegaVector = 0:0.01:5;
+zetaVector = [0,0.1,0.2,0.3,0.5,1];
+
+freqRatio = omegaVector/2;
+ampRatio = zeros(length(omegaVector),length(zetaVector));
+phaseAngle = ampRatio;
+
+for i = 1:length(omegaVector)
+    for j = 1:length(zetaVector)
+        ampRatio(i,j) = X(omegaVector(i),zetaVector(j))*10/20;
+        phaseAngle(i,j) = phi(omegaVector(i),zetaVector(j));
+        if phaseAngle(i,j)>0
+            phaseAngle(i,j) = phaseAngle(i,j) - pi;
+        end
+    end
+end
+
+figure
+plot(freqRatio,ampRatio,'k-','LineWidth',1);
+xlim([0, 2.5]);
+ylim([0, 5]);
+xlabel('Frequency ratio $r=\frac{\omega}{\omega_n}$','Interpreter','latex');
+ylabel('Amplification ratio $X \frac{k}{F_0}$','Interpreter','latex');
+
+function_HighQualityPlot(gcf,'Times New Roman',12);
+print('AmplitudeResponse','-dmeta')
 %% Analytical Solution for the Amplitude of the Steady State Reponse
 % $$X={F_0}/m\sqrt(((\omega_n)^2-(\omega)^2)^2+(2 \zeta \omega_n \omega)^2)$$
 %%
