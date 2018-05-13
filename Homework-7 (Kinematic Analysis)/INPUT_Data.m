@@ -33,10 +33,11 @@ body3 = struct('type',type,'length',length,'position',globalPosition);
 InputParameters.bodies = [body1,body2,body3];
 
 %% INPUT THE CONSTRAINTS HERE (JOINTS)
-% First line indicates the joint type
-% Second line indicates the bodies involved in the joint (0 indicates ground)
+% First line indicates the joint type.
+% Second line indicates the bodies involved in the joint (0 indicates
+% ground).
 % Third line indicates the joint location following body reference
-% coordinate system
+% coordinate system.
 
 jointType = 'revolute';
 jointBodies = [0 1];
@@ -60,39 +61,15 @@ joint4 = struct('type',jointType,'bodies',jointBodies,'position',jointLocation);
 
 InputParameters.joints = [joint1,joint2,joint3,joint4];
 
+%% INPUT TIME DEPENDENT CONSTRAINT EQUATION HERE
+% A function: f(t)=omega*t is considered.
+constraintBody = 1; % Input the affected body ID
+constraintDOF = 3; % Input the affetced DOF of that body
+constraintFun = @(t) omega*t; % Constraint function
+constraintFunD = @(t) omega; % Derivative of constraint function
+constraintFunDD = @(t) 0; % Second derivative of constraint function
+timeConstraint1 = struct('body',constraintBody,'DOF',constraintDOF,'fun',constraintFun,'funDiff',constraintFunD,'funDDiff',constraintFunDD);
 
-%% INPUT THE JOINT DETAILS HERE
+InputParameters.timeConstraints = [timeConstraint1];
 
-joint1.location = [0; 0]; % with respect to body reference coordintaes system
-joint1.body1id = 0;
-joint1.body2id = 1;
-joint1.disbody1 = [0; 0];
-joint1.disbody2 = [-0.5; 0];
-
-
-
-
-
-
-
-no_of_bodies = 1;
-L=1;
-q = zeros(10);
-
-y = q;
-yest= zeros(size(y));
-for n = 0:2
-    yest = yest + (q.^n)./factorial(n);
-end
-
-q0 = [L/2
-    0
-    0
-    3*L/2
-    0
-    0];
-qp0 = zeros(size(q0));
-
-y0 = [q0; qp0];
-
-[T, Y] = ode45(yest, tspan, y0);
+%% Solving Kinematics of the system
