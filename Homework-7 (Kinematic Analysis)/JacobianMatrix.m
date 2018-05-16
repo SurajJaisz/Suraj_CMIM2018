@@ -32,18 +32,18 @@ for n = 1:numel(InputParameters.joints)
             Cqt(:,[3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1)),3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2))]) = Cqt(:,[3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1)),3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2))]) + Cqn;
         end
         
-        Cq = [Cq Cqt]';
+        Cq = [Cq; Cqt];
     end
 end
 
 %% Defining Time Dependent Constraint
-for s = 1:numel(InputParameters.timeConstraints)
-    bodyDOF = 3*(numel(InputParameters.timeConstraints(s).body)-1)+1;
-    constraintDOF = bodyDOF(InputParameters.timeConstraints(s).DOF);
+for n = 1:numel(InputParameters.timeConstraints)
+    bodyDOF = 3*(numel(InputParameters.timeConstraints(n).body)-1)+1;
+    constraintDOF = bodyDOF(InputParameters.timeConstraints(n).DOF);
     Cqb = zeros(1,length(position));
     Cqb(constraintDOF) = -1;
     
-    Cq = [Cq Cqb]';
+    Cq = [Cq; Cqb];
 end
 
 end
