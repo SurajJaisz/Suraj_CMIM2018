@@ -10,7 +10,7 @@ InputParameters.tspan = 0:tstep:tfinal;
 L = 1; % in meters
 omega = -1;
 
-%% INPUT THE BODIES DETAILS HERE (Absolute Coordinate System)
+%% INPUT THE BODIES DETAILS HERE (Absolute Coordinate System, 2D System)
 % First line defines body type.
 % Second line defines length of the body
 % Third line defines body's global position vector initially.
@@ -42,22 +42,22 @@ InputParameters.bodies = [body1,body2,body3];
 jointType = 'revolute';
 jointBodies = [0 1];
 jointLocation = [[0 0]' [-L/2 0]'];
-joint1 = struct('type',jointType,'bodies',jointBodies,'position',jointLocation);
+joint1 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 jointType = 'revolute';
 jointBodies = [1 2];
 jointLocation = [[L/2 0]' [-L/2 0]'];
-joint2 = struct('type',jointType,'bodies',jointBodies,'position',jointLocation);
+joint2 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 jointType = 'revolute';
 jointBodies = [2 3];
 jointLocation = [[L/2 0]' [-L/2 0]'];
-joint3 = struct('type',jointType,'bodies',jointBodies,'position',jointLocation);
+joint3 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 jointType = 'revolute';
 jointBodies = [3 0];
 jointLocation = [[L/2 0]' [L 0]'];
-joint4 = struct('type',jointType,'bodies',jointBodies,'position',jointLocation);
+joint4 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 InputParameters.joints = [joint1,joint2,joint3,joint4];
 
@@ -73,3 +73,7 @@ timeConstraint1 = struct('body',constraintBody,'DOF',constraintDOF,'fun',constra
 InputParameters.timeConstraints = [timeConstraint1];
 
 %% Solving Kinematics of the system
+[t,x,xd,xdd] = kinematicAnalysis(InputParameters);
+
+%% Visualize results
+pproc_animate(x,t,InputParameters);
