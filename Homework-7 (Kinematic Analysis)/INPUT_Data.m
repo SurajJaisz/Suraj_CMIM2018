@@ -1,6 +1,8 @@
 clear; clc; close all;
 InputParameters = struct(); % Structure to input all the parameters
 
+% ===============================INPUT THE SYSTEM PARAMETERS HERE===============================
+
 %% Defining Time Step and Run Time for Simulation
 tstep = 0.01; % in seconds
 tfinal = 2; % in seconds
@@ -17,17 +19,17 @@ omega = -1;
 
 type = 'bar';
 length = L;
-globalPosition = [0 L/2 pi/2]';
+globalPosition = [0, L/2, pi/2]';
 body1 = struct('type',type,'length',length,'position',globalPosition);
 
 type = 'bar';
 length = L;
-globalPosition = [L/2 L 0]';
+globalPosition = [L/2, L, 0]';
 body2 = struct('type',type,'length',length,'position',globalPosition);
 
 type = 'bar';
 length = L;
-globalPosition = [L L/2 -pi/2]';
+globalPosition = [L, L/2, -pi/2]';
 body3 = struct('type',type,'length',length,'position',globalPosition);
 
 InputParameters.bodies = [body1,body2,body3];
@@ -40,23 +42,23 @@ InputParameters.bodies = [body1,body2,body3];
 % coordinate system.
 
 jointType = 'revolute';
-jointBodies = [0 1];
-jointLocation = [[0 0]' [-L/2 0]'];
+jointBodies = [0, 1];
+jointLocation = [[0;0], [-L/2;0]];
 joint1 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 jointType = 'revolute';
-jointBodies = [1 2];
-jointLocation = [[L/2 0]' [-L/2 0]'];
+jointBodies = [1, 2];
+jointLocation = [[L/2;0], [-L/2;0]];
 joint2 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 jointType = 'revolute';
-jointBodies = [2 3];
-jointLocation = [[L/2 0]' [-L/2 0]'];
+jointBodies = [2, 3];
+jointLocation = [[L/2;0], [-L/2;0]];
 joint3 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 jointType = 'revolute';
-jointBodies = [3 0];
-jointLocation = [[L/2 0]' [L 0]'];
+jointBodies = [3, 0];
+jointLocation = [[L/2;0], [L;0]];
 joint4 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 InputParameters.joints = [joint1,joint2,joint3,joint4];
@@ -65,15 +67,19 @@ InputParameters.joints = [joint1,joint2,joint3,joint4];
 % A function: f(t)=omega*t is considered.
 constraintBody = 1; % Input the affected body ID
 constraintDOF = 3; % Input the affetced DOF of that body
-constraintFun = @(t) omega*t; % Constraint function
+constraintFun = @(t) (pi/2)+omega*t; % Constraint function
 constraintFunD = @(t) omega; % Derivative of constraint function
 constraintFunDD = @(t) 0; % Second derivative of constraint function
 timeConstraint1 = struct('body',constraintBody,'DOF',constraintDOF,'fun',constraintFun,'funDiff',constraintFunD,'funDDiff',constraintFunDD);
 
 InputParameters.timeConstraints = [timeConstraint1];
 
+% ===============================INPUT THE SYSTEM PARAMETERS END'S HERE===============================
+
 %% Solving Kinematics of the system
 [t,x,xd,xdd] = kinematicAnalysis(InputParameters);
+% figure
+% plot(t,xdd(1,:))
 
 %% Visualize results
 pproc_animate(x,t,InputParameters);

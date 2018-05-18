@@ -31,18 +31,21 @@ for t = 1:length(time)
         x0dd = qdd(:,t-1);
         
         constEqs = @(x) constraintEquations(InputParameters,x,time(t));
-        jacobDiff = @(x) jacobianDifference(constEqs,x,h);
-        q(:,t) = Newton_Raphson(constEqs,jacobDiff,x0,tolerance,maxIterations);
+        jacobFDiff = @(x) jacobianFDifference(constEqs,x,h);
+%         q(:,t) = Newton_Raphson(constEqs,jacobDiff,x0,tolerance);
+        q(:,t) = Newton_Raphson(constEqs,jacobFDiff,x0,tolerance,maxIterations);
     end
     
     % Solution for Velocity Analysis
     constEqsD = @(xd) JacobianMatrix(InputParameters,q(:,t))*xd + Ct(InputParameters,q(:,t),xd,time(t));
-    jacobDiffD = @(xd) jacobianDifference(constEqsD,xd,h);
-    qd(:,t) = Newton_Raphson(constEqsD,jacobDiffD,x0d,tolerance,maxIterations);
+    jacobFDiffD = @(xd) jacobianFDifference(constEqsD,xd,h);
+%     qd(:,t) = Newton_Raphson(constEqsD,jacobDiffD,x0d,tolerance);
+    qd(:,t) = Newton_Raphson(constEqsD,jacobFDiffD,x0d,tolerance,maxIterations);
     
     % Solution for Acceleration Analysis
     constEqsDD = @(xdd) JacobianMatrix(InputParameters,q(:,t))*xdd - C_Gamma(InputParameters,q(:,t),qd(:,t),time(t));
-    jacobDiffDD = @(xdd) jacobianDifference(constEqsDD,xdd,h);
-    qdd(:,t) = Newton_Raphson(constEqsDD,jacobDiffDD,x0dd,tolerance,maxIterations);
+    jacobFDiffDD = @(xdd) jacobianFDifference(constEqsDD,xdd,h);
+%     qdd(:,t) = Newton_Raphson(constEqsDD,jacobDiffDD,x0dd,tolerance);
+    qdd(:,t) = Newton_Raphson(constEqsDD,jacobFDiffDD,x0dd,tolerance,maxIterations);
 
 end

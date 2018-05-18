@@ -1,4 +1,4 @@
-function x = Newton_Raphson(fun,funD,starting_value,tol,maxIter) 
+function x = Newton_Raphson(fun,funD,starting_value,tol,maxIter)
 
 x = starting_value;
 i = 0;

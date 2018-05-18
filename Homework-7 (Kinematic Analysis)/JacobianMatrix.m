@@ -10,11 +10,11 @@ for n = 1:numel(InputParameters.joints)
     jointLocation = InputParameters.joints(n).location;
     
     if jointBodies(1) == 0
-        bodyPosition = [[0 0 0]' position(3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2)))];
+        bodyPosition = [[0;0;0], position(rangeCal(jointBodies(2)))];
     elseif jointBodies(2) == 0
-        bodyPosition = [position(3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1))) [0 0 0]'];
+        bodyPosition = [position(rangeCal(jointBodies(1))), [0;0;0]];
     else
-        bodyPosition = [position(3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1))) position(3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2)))];
+        bodyPosition = [position(rangeCal(jointBodies(1))), position(rangeCal(jointBodies(2)))];
     end
     
     if strcmp(jointType,'revolute')
@@ -25,11 +25,11 @@ for n = 1:numel(InputParameters.joints)
         
         Cqt = zeros(2,length(position));
         if jointBodies(1) == 0
-            Cqt(:,3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2))) = Cqt(:,3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2))) + Cqn(:,4:6);
+            Cqt(:,rangeCal(jointBodies(2))) = Cqt(:,rangeCal(jointBodies(2))) + Cqn(:,4:6);
         elseif jointBodies(2) == 0
-            Cqt(:,3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1))) = Cqt(:,3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1))) + Cqn(:,1:3);
+            Cqt(:,rangeCal(jointBodies(1))) = Cqt(:,rangeCal(jointBodies(1))) + Cqn(:,1:3);
         else
-            Cqt(:,[3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1)),3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2))]) = Cqt(:,[3*(numel(InputParameters.bodies(1))-1)+1:3*numel(InputParameters.bodies(1)),3*(numel(InputParameters.bodies(2))-1)+1:3*numel(InputParameters.bodies(2))]) + Cqn;
+            Cqt(:,[rangeCal(jointBodies(1)),rangeCal(jointBodies(2))]) = Cqt(:,[rangeCal(jointBodies(1)),rangeCal(jointBodies(2))]) + Cqn;
         end
         
         Cq = [Cq; Cqt];
@@ -37,12 +37,21 @@ for n = 1:numel(InputParameters.joints)
 end
 
 %% Defining Time Dependent Constraint
-for n = 1:numel(InputParameters.timeConstraints)
-    bodyDOF = 3*(numel(InputParameters.timeConstraints(n).body)-1)+1;
-    constraintDOF = bodyDOF(InputParameters.timeConstraints(n).DOF);
-    Cqb = zeros(1,length(position));
-    Cqb(constraintDOF) = -1;
+% for n = 1:numel(InputParameters.timeConstraints)
+%     bodyDOF = 3*(numel(InputParameters.timeConstraints(n).body)-1)+1;
+%     constraintDOF = bodyDOF(InputParameters.timeConstraints(n).DOF);
+%     Cqb = zeros(1,length(position));
+%     Cqb(constraintDOF) = -1;
+%     
+%     Cq = [Cq; Cqb];
+% end
+for j = 1:numel(InputParameters.timeConstraints)
+    bdof = rangeCal(InputParameters.timeConstraints(j).body); % 3*(numel(InputParameters.timeConstraints(n).body)-1)+1;
+    cdof = bdof(InputParameters.timeConstraints(j).DOF);
     
+    Cqb = zeros(1,length(position));
+    Cqb(cdof) = -1;
+        
     Cq = [Cq; Cqb];
 end
 
