@@ -10,27 +10,32 @@ InputParameters.tspan = 0:tstep:tfinal;
 
 %% Defining Numerical Parameters for the System
 L = 1; % in meters
+m = 2; % in kg
 omega = -1;
 
 %% INPUT THE BODIES DETAILS HERE (Absolute Coordinate System, 2D System)
 % First line defines body type.
 % Second line defines length of the body
-% Third line defines body's global position vector initially.
+% Third line defines the mass of the body
+% Fourth line defines body's global position vector initially.
 
 type = 'bar';
 length = L;
+mass = m;
 globalPosition = [0, L/2, pi/2]';
-body1 = struct('type',type,'length',length,'position',globalPosition);
+body1 = struct('type',type,'length',length,'mass',mass,'position',globalPosition);
 
 type = 'bar';
 length = L;
+mass = m;
 globalPosition = [L/2, L, 0]';
-body2 = struct('type',type,'length',length,'position',globalPosition);
+body2 = struct('type',type,'length',length,'mass',mass,'position',globalPosition);
 
 type = 'bar';
 length = L;
+mass = m;
 globalPosition = [L, L/2, -pi/2]';
-body3 = struct('type',type,'length',length,'position',globalPosition);
+body3 = struct('type',type,'length',length,'mass',mass,'position',globalPosition);
 
 InputParameters.bodies = [body1,body2,body3];
 
