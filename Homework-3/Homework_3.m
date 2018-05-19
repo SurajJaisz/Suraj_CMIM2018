@@ -1,7 +1,7 @@
 %% Forced Vibration Steady-State Response Script
 % Author:   Suraj Jaiswal,
-% Date:     06.02.2018
-% Updated:  07.05.2018
+% Created:  06.02.2018
+% Updated:  20.05.2018
 
 %% Clearing the matlab workspace
 %%
@@ -53,14 +53,14 @@ pretty(solution_forcedVibration_rewrite5)
 
 %% Response from Symbolical Solution of Forced Damped Vibration 
 %%
-symbolicResponse_forcedVibration = simplify(expand(subs(solution_forcedVibration_rewrite5,[A,F0,k,omega,omega_n,zeta],[0,20,10,2,2,0.5])))
+symbolicResponse_forcedVibration = simplify(expand(subs(solution_forcedVibration_rewrite5,[A,F0,k,omega,omega_n,zeta],[-1,20,10,2,2,0.5])));
 
 %% Response from Steady State Solution of Forced Damped Vibration 
 %%
 X = @(omega,zeta) 20/(10*sqrt((1-omega^2/2^2)^2+(2*zeta*omega/2)^2));
 phi = @(omega,zeta) atan((-2*zeta*omega/2)/(1-omega^2/2^2));
 analyticalResponse_forcedVibration1 = @(omega,zeta,t) X(omega,zeta)*sin(omega*t+phi(omega,zeta));
-analyticalResponse_forcedVibration = @(t) analyticalResponse_forcedVibration1(2,0.5,t)
+analyticalResponse_forcedVibration = @(t) analyticalResponse_forcedVibration1(2,0.5,t);
 
 %% Function for Creating High Quality Publications Plots
 %%
@@ -73,14 +73,15 @@ fplot(symbolicResponse_forcedVibration,[0,10],'k-','LineWidth',1.5);
 hold on;
 fplot(analyticalResponse_forcedVibration,[0,10],'k:','LineWidth',1.5);
 hold off;
-xlabel('Time');
-ylabel('Position');
+xlabel('Time (s)');
+ylabel('Position (m)');
 legend('Response from Symbolical Solution','Response from Steady State Solution');
 function_HighQualityPlot(gcf,'Times New Roman',12);
 
 %% Printing Plot as a Vector Graphics to be used in Microsoft Word
 %%
-print('ForcedVibrationResponse','-dmeta')
+% print('ForcedVibrationResponse','-dmeta') % For word document-depsc
+print('ForcedVibrationResponse','-depsc') % For LaTex document
 
 %% Amplitude Response for Forced Vibration
 %%
@@ -102,59 +103,81 @@ for i = 1:length(omegaVector)
 end
 
 figure
-plot(freqRatio,ampRatio,'k-','LineWidth',1);
+plot(freqRatio,ampRatio,'k-','LineWidth',1.5);
 xlim([0, 2.5]);
 ylim([0, 5]);
 xlabel('Frequency ratio $r=\frac{\omega}{\omega_n}$','Interpreter','latex');
 ylabel('Amplification ratio $X \frac{k}{F_0}$','Interpreter','latex');
-
+annotation('textarrow',[0.6,0.52],[0.3,0.18],'String','$\zeta = 1.0$','Interpreter','latex')
+annotation('textarrow',[0.58,0.48],[0.4,0.255],'String','$\zeta = 0.5$','Interpreter','latex')
+annotation('textarrow',[0.57,0.45],[0.5,0.375],'String','$\zeta = 0.3$','Interpreter','latex')
+annotation('textarrow',[0.55,0.44],[0.6,0.52],'String','$\zeta = 0.2$','Interpreter','latex')
+annotation('textarrow',[0.55,0.468],[0.71,0.68],'String','$\zeta = 0.1$','Interpreter','latex')
+annotation('textarrow',[0.55,0.478],[0.82,0.780],'String','$\zeta = 0$','Interpreter','latex')
+annotation('textarrow',[0.55,0.402],[0.82,0.80])
 function_HighQualityPlot(gcf,'Times New Roman',12);
-print('AmplitudeResponse','-dmeta')
-%% Analytical Solution for the Amplitude of the Steady State Reponse
-% $$X={F_0}/m\sqrt(((\omega_n)^2-(\omega)^2)^2+(2 \zeta \omega_n \omega)^2)$$
+print('AmplitudeResponse','-depsc')
+
+%% Phase Angle Response for Forced Vibration
 %%
-syms omega_n real
-syms zeta real
-syms r real
-syms X0
+figure
+plot(freqRatio,phaseAngle*180/pi,'k-','LineWidth',1.5);
+xlabel('Frequency ratio $r=\frac{\omega}{\omega_n}$','Interpreter','latex');
+ylabel('Phase angle (deg) $\phi$','Interpreter','latex');
+annotation('textarrow',[0.8,0.70],[0.4,0.153],'String','$\zeta = 0.1$','Interpreter','latex')
+annotation('textarrow',[0.73,0.61],[0.5,0.223],'String','$\zeta = 0.2$','Interpreter','latex')
+annotation('textarrow',[0.63,0.535],[0.55,0.333],'String','$\zeta = 0.3$','Interpreter','latex')
+annotation('textarrow',[0.60,0.49],[0.71,0.45],'String','$\zeta = 0.5$','Interpreter','latex')
+annotation('textarrow',[0.52,0.46],[0.82,0.505],'String','$\zeta = 1$','Interpreter','latex')
+function_HighQualityPlot(gcf,'Times New Roman',12);
+print('PhaseAngleResponse','-depsc')
 
-Eq2= X0*k/F0 == 1/sqrt((1-(omega/omega_n)^2)^2+(2*zeta*(omega/omega_n))^2);
-steadystatesolution = solve(Eq2, X0);
-disp(steadystatesolution)
-symvar(steadystatesolution)
-
-%% Replacing $$\omega/\omega_n$ by $$r$
-%%
-steadystatesolution_rewrite = subs(steadystatesolution, omega/omega_n, r);
-disp(steadystatesolution_rewrite)
-symvar(steadystatesolution_rewrite)
-
-%% Rewriting the solution in this form
-% $$X k /{F_0}=1/\sqrt((1-r^2)^2+(2 \zeta r)^2)$$
-%%
-steadystatesolution_rearrange = simplify(steadystatesolution_rewrite*k/F0);
-disp(steadystatesolution_rearrange)
-symvar(steadystatesolution_rearrange)
-
-%% Ploting the Required Solution
-%%
-figure(1)
-fplot(subs(steadystatesolution_rearrange, [zeta], [0:0.10:1]), [0, 10]);
-grid on
-
-%% Creating High Quality Plots for Publication
-%%
-xlim([0, 2.5]); % set y axis limit
-ylim([0, 5]); % set y axis limit
-xlabel('Frequency Ratio (r=\omega /\omega_n)', 'FontSize',12, 'FontName', 'Times New Roman'); % xlabel
-ylabel('Amplification Ratio (X k/{F_0})', 'FontSize',12, 'FontName', 'Times New Roman'); % ylabel
-title ('Amplitude Response in Steady State', 'FontSize',12, 'FontName', 'Times New Roman');%'FontType', "sans-serif") % title
-
-%% Creating Annotations Seperately
-%%
-% Needs to be added
-
-%% Printing Plot as a Vector Graphics to be used in Microsoft Word
-%%
-print('Z:\cmim2018\Suraj_CMIM2018\Homework-3\SteadtStatePlot','-dmeta')
-
+% ====================================END==================================
+% % % %% Analytical Solution for the Amplitude of the Steady State Reponse
+% % % % $$X={F_0}/m\sqrt(((\omega_n)^2-(\omega)^2)^2+(2 \zeta \omega_n \omega)^2)$$
+% % % %%
+% % % syms omega_n real
+% % % syms zeta real
+% % % syms r real
+% % % syms X0
+% % % 
+% % % Eq2= X0*k/F0 == 1/sqrt((1-(omega/omega_n)^2)^2+(2*zeta*(omega/omega_n))^2);
+% % % steadystatesolution = solve(Eq2, X0);
+% % % disp(steadystatesolution)
+% % % symvar(steadystatesolution)
+% % % 
+% % % %% Replacing $$\omega/\omega_n$ by $$r$
+% % % %%
+% % % steadystatesolution_rewrite = subs(steadystatesolution, omega/omega_n, r);
+% % % disp(steadystatesolution_rewrite)
+% % % symvar(steadystatesolution_rewrite)
+% % % 
+% % % %% Rewriting the solution in this form
+% % % % $$X k /{F_0}=1/\sqrt((1-r^2)^2+(2 \zeta r)^2)$$
+% % % %%
+% % % steadystatesolution_rearrange = simplify(steadystatesolution_rewrite*k/F0);
+% % % disp(steadystatesolution_rearrange)
+% % % symvar(steadystatesolution_rearrange)
+% % % 
+% % % %% Ploting the Required Solution
+% % % %%
+% % % figure(1)
+% % % fplot(subs(steadystatesolution_rearrange, [zeta], [0:0.10:1]), [0, 10]);
+% % % grid on
+% % % 
+% % % %% Creating High Quality Plots for Publication
+% % % %%
+% % % xlim([0, 2.5]); % set y axis limit
+% % % ylim([0, 5]); % set y axis limit
+% % % xlabel('Frequency Ratio (r=\omega /\omega_n)', 'FontSize',12, 'FontName', 'Times New Roman'); % xlabel
+% % % ylabel('Amplification Ratio (X k/{F_0})', 'FontSize',12, 'FontName', 'Times New Roman'); % ylabel
+% % % title ('Amplitude Response in Steady State', 'FontSize',12, 'FontName', 'Times New Roman');%'FontType', "sans-serif") % title
+% % % 
+% % % %% Creating Annotations Seperately
+% % % %%
+% % % % Needs to be added
+% % % 
+% % % %% Printing Plot as a Vector Graphics to be used in Microsoft Word
+% % % %%
+% % % print('Z:\cmim2018\Suraj_CMIM2018\Homework-3\SteadtStatePlot','-dmeta')
+% % % 
