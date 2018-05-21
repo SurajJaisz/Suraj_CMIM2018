@@ -2,7 +2,7 @@ function [time,u,v] = odeSIE(funF,funG,tspan,u0,v0)
 %odeSIE Simple integration method using Semi-implicit Euler
 %   Detailed explanation goes here
 time = tspan;
-n = length(time);
+n = length(tspan);
 u = zeros(length(u0),n);
 v = zeros(length(v0),n);
 u(:,1) = u0;

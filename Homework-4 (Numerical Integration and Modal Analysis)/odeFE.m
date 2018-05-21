@@ -3,7 +3,7 @@ function [time,u] = odeFE(fun,initialPosition,tspan)
 %   Detailed explanation goes here
 
 time = tspan;
-u = zeros(length(initialPosition,length(tspan)));
+u = zeros(length(initialPosition),length(tspan));
 u(:,1) = initialPosition;
 
 for n = 1:length(tspan)-1
