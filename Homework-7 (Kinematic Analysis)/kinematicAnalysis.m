@@ -3,6 +3,7 @@ function [time,q,qd,qdd] = kinematicAnalysis(InputParameters)
 %   Detailed explanation goes here.
 
 time = InputParameters.tspan;
+dt = InputParameters.tstep;
 
 %% Defining Initial Values of the Position, Velocity, and Acceleration Coordinate (2D System)
 
@@ -26,9 +27,11 @@ for t = 1:length(time)
         x0d = zeros(3*numel(InputParameters.bodies),1);
         x0dd = zeros(3*numel(InputParameters.bodies),1);        
     else
-        x0 = q(:,t-1);
-        x0d = qd(:,t-1);
-        x0dd = qdd(:,t-1);
+%         x0 = q(:,t-1);
+%         x0d = qd(:,t-1);
+%         x0dd = qdd(:,t-1);
+        % Taylor expansion to determine initial guess
+        x0 = q(:,t-1) + qd(:,t-1)*dt + 0.5*qdd(:,t-1)*dt^2;
         
         constEqs = @(x) constraintEquations(InputParameters,x,time(t));
         jacobFDiff = @(x) jacobianFDifference(constEqs,x,h);
