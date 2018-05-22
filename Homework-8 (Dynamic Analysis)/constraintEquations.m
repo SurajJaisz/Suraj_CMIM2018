@@ -21,7 +21,7 @@ for n = 1:numel(InputParameters.joints)
         constraintEquations = [constraintEquations
                                 bodyPosition(1,1)-bodyPosition(1,2)+jointLocation(1,1)*cos(bodyPosition(3,1))-jointLocation(1,2)*cos(bodyPosition(3,2))-jointLocation(2,1)*sin(bodyPosition(3,1))+jointLocation(2,2)*sin(bodyPosition(3,2))
                                 bodyPosition(2,1)-bodyPosition(2,2)+jointLocation(1,1)*sin(bodyPosition(3,1))-jointLocation(1,2)*sin(bodyPosition(3,2))+jointLocation(2,1)*cos(bodyPosition(3,1))-jointLocation(2,2)*cos(bodyPosition(3,2))];
-    end
+    end 
 end
 
 %% Defining Time Dependent Constraint Equations

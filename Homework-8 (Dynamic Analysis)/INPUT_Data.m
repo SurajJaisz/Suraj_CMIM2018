@@ -5,14 +5,18 @@ InputParameters = struct(); % Structure to input all the parameters
 
 %% Defining Time Step and Run Time for Simulation
 tstep = 0.01; % in seconds
-tfinal = 2; % in seconds
+tfinal = 1; % in seconds
 InputParameters.tspan = 0:tstep:tfinal;
-InputParameters.solver = 'ode45'; % Other solver options can be provided here.
+InputParameters.solver = 'ode45';
+InputParameters.solverOptn = odeset;
 
 %% Defining Numerical Parameters for the System
 L = 1; % in meters
 m = 2; % in kg
 omega = -1;
+InputParameters.gravity = [0;-9.81]; % Defining gravity
+InputParameters.alpha = 10;
+InputParameters.beta = 10;
 
 %% INPUT THE BODIES DETAILS HERE (Absolute Coordinate System, 2D System)
 % First line defines body type.
@@ -69,23 +73,58 @@ joint4 = struct('type',jointType,'bodies',jointBodies,'location',jointLocation);
 
 InputParameters.joints = [joint1,joint2,joint3,joint4];
 
-%% INPUT TIME DEPENDENT CONSTRAINT EQUATION HERE
-% A function: f(t)=omega*t is considered.
-constraintBody = 1; % Input the affected body ID
-constraintDOF = 3; % Input the affetced DOF of that body
-constraintFun = @(t) (pi/2)+omega*t; % Constraint function
-constraintFunD = @(t) omega; % Derivative of constraint function
-constraintFunDD = @(t) 0; % Second derivative of constraint function
-timeConstraint1 = struct('body',constraintBody,'DOF',constraintDOF,'fun',constraintFun,'funDiff',constraintFunD,'funDDiff',constraintFunDD);
-
-InputParameters.timeConstraints = [timeConstraint1];
+% % %% INPUT TIME DEPENDENT CONSTRAINT EQUATION HERE
+% % % A function: f(t)=omega*t is considered.
+% % constraintBody = 1; % Input the affected body ID
+% % constraintDOF = 3; % Input the affetced DOF of that body
+% % constraintFun = @(t) (pi/2)+omega*t; % Constraint function
+% % constraintFunD = @(t) omega; % Derivative of constraint function
+% % constraintFunDD = @(t) 0; % Second derivative of constraint function
+% % timeConstraint1 = struct('body',constraintBody,'DOF',constraintDOF,'fun',constraintFun,'funDiff',constraintFunD,'funDDiff',constraintFunDD);
+% % 
+InputParameters.timeConstraints = [];
 
 % ===============================INPUT THE SYSTEM PARAMETERS END'S HERE===============================
 
-%% Solving Kinematics of the system
-[t,x,xd,xdd] = kinematicAnalysis(InputParameters);
-% figure
-% plot(t,xdd(1,:))
+%% Program Automatically Selecting the type of Analysis (Kinematic or Dynamic)
+InputParameters.numGenCood = 3*numel(InputParameters.bodies); % calculating number of generalized coordinates
+C = constraintEquations(InputParameters,zeros(InputParameters.numGenCood,1),0);
+InputParameters.numConsEqn = size(C);% calculating number of constarint equations
+InputParameters.numDOF = InputParameters.numGenCood-InputParameters.numConsEqn; % calculating number of degree of freedom of the system
+
+if InputParameters.numDOF > 0
+    [t,x,xd,xdd] = dynamicAnalysis(InputParameters); % Solving Dynamics of the system
+elseif InputParameters.numDOF == 0
+    [t,x,xd,xdd] = kinematicAnalysis(InputParameters); % Solving Kinematics of the system
+else
+    disp('The System is Overconstarined')
+    t = 0;
+    x = 0;
+    xd = 0;
+    xdd = 0;
+end
 
 %% Visualize results
-pproc_animate(x,t,InputParameters);
+% pproc_animate(x,t,InputParameters);
+
+%% Testing
+
+for i = 1:numel(t)
+    Rc(:,i) = sum(abs(constraintEquations(InputParameters,x(:,i),t(i))));
+end
+% figure
+semilogy(t,abs(Rc),'k-.','LineWidth',1);
+grid on
+
+% 
+% figure
+% plot(t,x(1,:))
+% title('position')
+% 
+% figure
+% plot(t,xd(1,:))
+% title('velocity')
+% 
+% figure
+% plot(t,xdd(1,:))
+% title('acceleration')
