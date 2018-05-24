@@ -6,12 +6,14 @@ timespan = InputParameters.tspan;
 
 %% Defining Initial Conditions (2D System)
 
-x0 = zeros(InputParameters.numGenCood,1);
+% x0 = zeros(InputParameters.numGenCood,1);
+% 
+% for n = 1:numel(InputParameters.bodies)
+%     x0(3*(n-1)+1:3*n) = InputParameters.bodies(n).position;
+% end
+x0 = InputParameters.x0;
 
-for n = 1:numel(InputParameters.bodies)
-    x0(3*(n-1)+1:3*n) = InputParameters.bodies(n).position;
-end
-q0 = [x0;zeros(size(x0));zeros(InputParameters.numConsEqn)];
+q0 = [x0;zeros(size(x0));zeros(InputParameters.numConsEqn,1)];
 % q0 = [0;0;0;0;0;0;0;0;0];
 % qd = zeros(length(q0),length(time));
 % qdd = zeros(length(q0),length(time));

@@ -6,7 +6,7 @@ Ct = [];
 
 %% 
 for n = 1:numel(InputParameters.joints)
-    jointType = InputParameters.joints(n).type;
+    jointType = InputParameters.joints{n}.type;
 %     jointBodies = InputParameters.joints(n).bodies;
 %     jointLocation = InputParameters.joints(n).location;
 %     
