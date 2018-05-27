@@ -1,19 +1,20 @@
-function Q = systemForceVector (InputParameters)
+function Q = systemForceVector (InputParameters,x,t)
 % Calculating total force vector of the system
 %   Detailed explanation goes here
 
 Q = zeros(3*numel(InputParameters.bodies),1);
 
 for i = 1: numel(InputParameters.bodies)
-    
-    if strcmp(InputParameters.bodies(i).type,'bar')
-        m(i) = InputParameters.bodies(i).mass;
-        g = InputParameters.gravity;
-        
-        Qbody = [m(i)*g;0]; % Force vector on a body
+    bodyForces = {};
+    for f = 1:numel(InputParameters.forces)
+        if InputParameters.forces{f}.body == i
+            bodyForces = [bodyForces, InputParameters.forces{f}];
+        end
     end
     
-    Q(rangeCal(i),1) = Q(rangeCal(i),1) + Qbody;
+    xb = x(rangeCal(i));
+    
+    Q(rangeCal(i)) = Q(rangeCal(i)) + bodyForceVector(InputParameters.bodies(i),bodyForces,xb,InputParameters.gravity,t);
 end
 
 end

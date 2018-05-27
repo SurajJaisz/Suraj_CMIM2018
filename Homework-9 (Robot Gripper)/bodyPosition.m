@@ -3,10 +3,11 @@ function bPosition = bodyPosition(bodies,initialPosition)
 
 if bodies(1) == 0
         bPosition = [[0;0;0], initialPosition(rangeCal(bodies(2)))];
-    elseif bodies(2) == 0
+elseif bodies(2) == 0
         bPosition = [initialPosition(rangeCal(bodies(1))), [0;0;0]];
-    else
+else
         bPosition = [initialPosition(rangeCal(bodies(1))), initialPosition(rangeCal(bodies(2)))];
 end
+
 end
 

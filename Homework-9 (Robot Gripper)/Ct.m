@@ -7,7 +7,7 @@ Ct = [];
 %% 
 for n = 1:numel(InputParameters.joints)
     jointType = InputParameters.joints{n}.type;
-%     jointBodies = InputParameters.joints(n).bodies;
+%     jointBodies = InputParameters.joints{n}.bodies;
 %     jointLocation = InputParameters.joints(n).location;
 %     
 %     if jointBodies(1) == 0
@@ -23,6 +23,10 @@ for n = 1:numel(InputParameters.joints)
 %     
     if strcmp(jointType,'revolute')
         Ct = [Ct; zeros(2,1)];
+    elseif strcmp(jointType,'translational')
+        Ct = [Ct; zeros(2,1)];
+    elseif strcmp(jointType,'1DOF')
+        Ct = [Ct; 0];
     end
 end
 

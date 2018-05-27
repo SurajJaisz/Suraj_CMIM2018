@@ -10,7 +10,7 @@ yd = position(s+1:2*s,1);
 
 %% Calculating the Mass Matrix and Force Vector
 M = systemMassMatrix(InputParameters); % Calculating total mass matrix of the system
-Q = systemForceVector(InputParameters); % Calculating total force vector of the system
+Q = systemForceVector(InputParameters,y,time); % Calculating total force vector of the system
 
 %% Calculating T and Cdot
 Qc = C_Gamma(InputParameters,y,yd,time);
